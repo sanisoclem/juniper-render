@@ -47,6 +47,7 @@ async fn main() {
 
     let state = warp::any().map(|| Context);
     let graphql_filter = juniper_warp::make_graphql_filter(schema, state.boxed());
+    let port = std::env::var("PORT").map_err(|_| ()).and_then(|s| s.parse::<u16>().map_err(|_| ())).unwrap_or(8000);
 
     warp::serve(
         warp::get()
@@ -55,6 +56,6 @@ async fn main() {
             .or(warp::path("graphql").and(graphql_filter))
             .with(log),
     )
-    .run(([0, 0, 0, 0], 8000))
+    .run(([0, 0, 0, 0], port))
     .await
 }
